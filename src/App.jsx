@@ -15,7 +15,7 @@ export default function App() {
 
     try {
       // 가장 안정적인 모델 설정
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const prompt = `
         너는 아주 냉철하고 유머러스한 결정 장애 치료사야. 
