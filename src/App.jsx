@@ -12,7 +12,7 @@ export default function App() {
   const askAI = async () => {
     if (!question) return alert("고민을 입력해야 팩폭을 날리지!");
     setLoading(true);
-
+    console.log("새로운 고민 유입:", question);
     try {
       // 가장 안정적인 모델 설정
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-preview-09-2025" });
@@ -31,7 +31,7 @@ export default function App() {
       
       // 혹시나 섞여 나올 별표 제거 및 줄바꿈 정리
       const cleanResponse = aiResponse.replace(/\*\*/g, "").trim();
-
+      console.log("AI의 답변:", aiResponse);
       setResult({ 
         comment: cleanResponse,
         color: "bg-white" 
