@@ -1,52 +1,48 @@
 import React, { useState } from 'react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+
 
 export default function App() {
   const [question, setQuestion] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // ⚠️ 여기에 본인의 Gemini API 키를 넣으세요!
-  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+  
+  
 
-  const askAI = async () => {
-    if (!question) return alert("고민을 입력해야 팩폭을 날리지!");
-    setLoading(true);
-    console.log("새로운 고민 유입:", question);
-    try {
-      // 가장 안정적인 모델 설정
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-preview-09-2025" });
+ const askAI = async () => {
+  if (!question) return alert("고민을 입력해야 팩폭을 날리지!");
+  setLoading(true);
 
-      const prompt = `
-        너는 아주 냉철하고 유머러스한 결정 장애 치료사야. 
-        사용자의 고민: "${question}"
-        결정은 딱 두 글자(사라, 마라, 숏쳐, 롱쳐 등)사용자의 질문에 알맞게하고, 이유는 한 문장으로 짧고 킹받게 답해.
-        형식은 반드시 딱 이렇게만 해:
-        결정: [두글자]
-        이유: [한문장]
-      `;
+  try {
+    const res = await fetch("/api/ask", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ question })
+    });
 
-      const response = await model.generateContent(prompt);
-      const aiResponse = response.response.text();
-      
-      // 혹시나 섞여 나올 별표 제거 및 줄바꿈 정리
-      const cleanResponse = aiResponse.replace(/\*\*/g, "").trim();
-      console.log("AI의 답변:", aiResponse);
-      setResult({ 
-        comment: cleanResponse,
-        color: "bg-white" 
-      });
+    if (!res.ok) throw new Error("API 실패");
 
-    } catch (error) {
-      console.error("에러 발생:", error);
-      setResult({ 
-        comment: "내 지능이 네 고민을 감당 못 하네. (키 확인해봐!)", 
-        color: "bg-gray-200" 
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    const data = await res.json();
+
+    const cleanResponse = data.answer.replace(/\*\*/g, "").trim();
+
+    setResult({
+      comment: cleanResponse,
+      color: "bg-white"
+    });
+
+  } catch (error) {
+    setResult({
+      comment: "내 지능이 네 고민을 감당 못 하네. (서버 확인해봐!)",
+      color: "bg-gray-200"
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-[#FFDE4D] flex flex-col items-center justify-center p-6 font-mono text-black">
